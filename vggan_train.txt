@@ -1,0 +1,579 @@
+==========================================
+SLURM_JOB_ID = 1038955
+SLURM_NODELIST = gnode044
+SLURM_JOB_GPUS = 0,1,2,3
+==========================================
+/home2/souvikg544/miniconda3/envs/codeformer/lib/python3.9/site-packages/torch/distributed/launch.py:181: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use-env is set by default in torchrun.
+If your script expects `--local-rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+[2023-12-24 23:27:59,795] torch.distributed.run: [WARNING] 
+[2023-12-24 23:27:59,795] torch.distributed.run: [WARNING] *****************************************
+[2023-12-24 23:27:59,795] torch.distributed.run: [WARNING] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+[2023-12-24 23:27:59,795] torch.distributed.run: [WARNING] *****************************************
+2023-12-24 23:28:07,917 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	BasicSR: 1.3.2
+	PyTorch: 2.1.2+cu121
+	TorchVision: 0.16.2+cu121
+2023-12-24 23:28:07,918 INFO: 
+  name: 20231224_232804_VQGAN-512-ds32-nearest-stage1_our
+  model_type: VQGANModel
+  num_gpu: 8
+  manual_seed: 0
+  datasets:[
+    train:[
+      name: avspeech
+      type: avspeechDataset
+      dataroot_gt: /ssd_scratch/cvit/souvik/corrected_avspeech50/
+      filename_tmpl: {}
+      io_backend:[
+        type: disk
+      ]
+      in_size: 512
+      gt_size: 512
+      mean: [0.5, 0.5, 0.5]
+      std: [0.5, 0.5, 0.5]
+      use_hflip: True
+      use_corrupt: False
+      num_worker_per_gpu: 2
+      batch_size_per_gpu: 1
+      dataset_enlarge_ratio: 100
+      prefetch_mode: cpu
+      num_prefetch_queue: 4
+      phase: train
+    ]
+  ]
+  network_g:[
+    type: VQAutoEncoder
+    img_size: 512
+    nf: 64
+    ch_mult: [1, 2, 2, 4, 4, 8]
+    quantizer: nearest
+    codebook_size: 1024
+  ]
+  network_d:[
+    type: VQGANDiscriminator
+    nc: 3
+    ndf: 64
+  ]
+  path:[
+    pretrain_network_g: None
+    param_key_g: params_ema
+    strict_load_g: True
+    pretrain_network_d: None
+    strict_load_d: True
+    resume_state: None
+    experiments_root: /home2/souvikg544/souvik/CodeFormer/experiments/20231224_232804_VQGAN-512-ds32-nearest-stage1_our
+    models: /home2/souvikg544/souvik/CodeFormer/experiments/20231224_232804_VQGAN-512-ds32-nearest-stage1_our/models
+    training_states: /home2/souvikg544/souvik/CodeFormer/experiments/20231224_232804_VQGAN-512-ds32-nearest-stage1_our/training_states
+    log: /home2/souvikg544/souvik/CodeFormer/experiments/20231224_232804_VQGAN-512-ds32-nearest-stage1_our
+    visualization: /home2/souvikg544/souvik/CodeFormer/experiments/20231224_232804_VQGAN-512-ds32-nearest-stage1_our/visualization
+  ]
+  train:[
+    optim_g:[
+      type: Adam
+      lr: 7e-05
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    optim_d:[
+      type: Adam
+      lr: 7e-05
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: CosineAnnealingRestartLR
+      periods: [1600000]
+      restart_weights: [1]
+      eta_min: 6e-05
+    ]
+    total_iter: 1600000
+    warmup_iter: -1
+    ema_decay: 0.995
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 1.0
+      reduction: mean
+    ]
+    perceptual_opt:[
+      type: LPIPSLoss
+      loss_weight: 1.0
+      use_input_norm: True
+      range_norm: True
+    ]
+    gan_opt:[
+      type: GANLoss
+      gan_type: hinge
+      loss_weight: 1.0
+    ]
+    net_g_start_iter: 0
+    net_d_iters: 1
+    net_d_start_iter: 30001
+    manual_seed: 0
+  ]
+  val:[
+    val_freq: 50000000000.0
+    save_img: True
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 4
+        test_y_channel: False
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 10000.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29411
+  ]
+  find_unused_parameters: True
+  is_train: True
+  dist: True
+  rank: 0
+  world_size: 4
+
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+2023-12-24 23:28:08,406 INFO: Use random gray. Prob: 0.0
+2023-12-24 23:28:08,406 INFO: Dataset [avspeechDataset] - avspeech is built.
+number of items-  1838
+2023-12-24 23:28:08,406 INFO: Use cpu prefetch dataloader: num_prefetch_queue = 4
+number of items-  1838
+number of items-  1838
+2023-12-24 23:28:08,407 INFO: Training statistics:
+	Number of train images: 1838
+	Dataset enlarge ratio: 100
+	Batch size per gpu: 1
+	World size (gpu number): 4
+	Require iter number per epoch: 45950
+	Total epochs: 35; iters: 1600000.
+2023-12-24 23:28:08,993 INFO: Network [VQAutoEncoder] is created.
+2023-12-24 23:28:10,452 INFO: Network: DistributedDataParallel - VQAutoEncoder, with parameters: 63,740,099
+2023-12-24 23:28:10,452 INFO: VQAutoEncoder(
+  (encoder): Encoder(
+    (blocks): ModuleList(
+      (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1-2): 2 x ResBlock(
+        (norm1): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (3): Downsample(
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2))
+      )
+      (4): ResBlock(
+        (norm1): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(64, 128, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (5): ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (6): Downsample(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2))
+      )
+      (7-8): 2 x ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (9): Downsample(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(2, 2))
+      )
+      (10): ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(128, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (11): ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (12): Downsample(
+        (conv): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2))
+      )
+      (13-14): 2 x ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (15): Downsample(
+        (conv): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2))
+      )
+      (16): ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(256, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (17): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (18): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (19): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (20): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (21): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (22): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (23): GroupNorm(32, 512, eps=1e-06, affine=True)
+      (24): Conv2d(512, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (quantize): VectorQuantizer(
+    (embedding): Embedding(1024, 256)
+  )
+  (generator): Generator(
+    (blocks): ModuleList(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (2): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (3-4): 2 x ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (5): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (6): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (7): AttnBlock(
+        (norm): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (q): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (k): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (v): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+        (proj_out): Conv2d(512, 512, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (8): Upsample(
+        (conv): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (9): ResBlock(
+        (norm1): GroupNorm(32, 512, eps=1e-06, affine=True)
+        (conv1): Conv2d(512, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (10): ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (11): Upsample(
+        (conv): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (12-13): 2 x ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (14): Upsample(
+        (conv): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (15): ResBlock(
+        (norm1): GroupNorm(32, 256, eps=1e-06, affine=True)
+        (conv1): Conv2d(256, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (16): ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (17): Upsample(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (18-19): 2 x ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (20): Upsample(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (21): ResBlock(
+        (norm1): GroupNorm(32, 128, eps=1e-06, affine=True)
+        (conv1): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (conv_out): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (22): ResBlock(
+        (norm1): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        (norm2): GroupNorm(32, 64, eps=1e-06, affine=True)
+        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      )
+      (23): GroupNorm(32, 64, eps=1e-06, affine=True)
+      (24): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+)
+2023-12-24 23:28:10,452 INFO: Use Exponential Moving Average with decay: 0.995
+2023-12-24 23:28:11,051 INFO: Network [VQAutoEncoder] is created.
+2023-12-24 23:28:11,183 INFO: Network [VQGANDiscriminator] is created.
+2023-12-24 23:28:11,210 INFO: Network: DistributedDataParallel - VQGANDiscriminator, with parameters: 6,960,961
+2023-12-24 23:28:11,210 INFO: VQGANDiscriminator(
+  (main): Sequential(
+    (0): Conv2d(3, 64, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1))
+    (1): LeakyReLU(negative_slope=0.2, inplace=True)
+    (2): Conv2d(64, 128, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False)
+    (3): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (4): LeakyReLU(negative_slope=0.2, inplace=True)
+    (5): Conv2d(128, 256, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False)
+    (6): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (7): LeakyReLU(negative_slope=0.2, inplace=True)
+    (8): Conv2d(256, 512, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False)
+    (9): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (10): LeakyReLU(negative_slope=0.2, inplace=True)
+    (11): Conv2d(512, 512, kernel_size=(4, 4), stride=(1, 1), padding=(1, 1), bias=False)
+    (12): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (13): LeakyReLU(negative_slope=0.2, inplace=True)
+    (14): Conv2d(512, 1, kernel_size=(4, 4), stride=(1, 1), padding=(1, 1))
+  )
+)
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+2023-12-24 23:28:11,211 INFO: Loss [L1Loss] is created.
+Setting up [LPIPS] perceptual loss: trunk [vgg], v[0.1], spatial [off]
+Loading model from: /home2/souvikg544/miniconda3/envs/codeformer/lib/python3.9/site-packages/lpips/weights/v0.1/vgg.pth
+Loading model from: /home2/souvikg544/miniconda3/envs/codeformer/lib/python3.9/site-packages/lpips/weights/v0.1/vgg.pth
+2023-12-24 23:28:12,794 INFO: Loss [LPIPSLoss] is created.
+2023-12-24 23:28:12,808 INFO: Loss [GANLoss] is created.
+2023-12-24 23:28:12,809 INFO: vqgan_quantizer: nearest
+2023-12-24 23:28:12,811 INFO: Model [VQGANModel] is created.
+Loading model from: /home2/souvikg544/miniconda3/envs/codeformer/lib/python3.9/site-packages/lpips/weights/v0.1/vgg.pth
+Loading model from: /home2/souvikg544/miniconda3/envs/codeformer/lib/python3.9/site-packages/lpips/weights/v0.1/vgg.pth
+number of items-  1838
+2023-12-24 23:28:22,390 INFO: Start training from epoch: 0, iter: 1
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+number of items-  1838
+[W reducer.cpp:1346] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1346] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1346] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1346] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+2023-12-24 23:29:07,642 INFO: [20231..][epoch:  0, iter:     100, lr:(7.000e-05,)] [eta: 10 days, 1:15:38, time (data): 0.272 (0.001)] l_g_pix: 2.2917e-01 l_g_percep: 5.9973e-01 l_codebook: 2.1887e+01 
+2023-12-24 23:29:34,746 INFO: [20231..][epoch:  0, iter:     200, lr:(7.000e-05,)] [eta: 7 days, 13:08:55, time (data): 0.269 (0.001)] l_g_pix: 1.8257e-01 l_g_percep: 5.3786e-01 l_codebook: 2.3725e+01 
+2023-12-24 23:30:01,952 INFO: [20231..][epoch:  0, iter:     300, lr:(7.000e-05,)] [eta: 6 days, 17:07:22, time (data): 0.268 (0.001)] l_g_pix: 1.6919e-01 l_g_percep: 5.7002e-01 l_codebook: 3.3095e+00 
+2023-12-24 23:30:29,508 INFO: [20231..][epoch:  0, iter:     400, lr:(7.000e-05,)] [eta: 6 days, 7:28:06, time (data): 0.269 (0.001)] l_g_pix: 1.5600e-01 l_g_percep: 5.2977e-01 l_codebook: 1.8359e+00 
+2023-12-24 23:30:56,964 INFO: [20231..][epoch:  0, iter:     500, lr:(7.000e-05,)] [eta: 6 days, 1:34:36, time (data): 0.269 (0.001)] l_g_pix: 1.2262e-01 l_g_percep: 4.9603e-01 l_codebook: 2.2812e+00 
+2023-12-24 23:31:24,485 INFO: [20231..][epoch:  0, iter:     600, lr:(7.000e-05,)] [eta: 5 days, 21:41:29, time (data): 0.271 (0.001)] l_g_pix: 1.0890e-01 l_g_percep: 4.5386e-01 l_codebook: 1.5249e+00 
+2023-12-24 23:31:51,869 INFO: [20231..][epoch:  0, iter:     700, lr:(7.000e-05,)] [eta: 5 days, 18:49:30, time (data): 0.269 (0.001)] l_g_pix: 1.1788e-01 l_g_percep: 4.5787e-01 l_codebook: 1.3048e+00 
+2023-12-24 23:32:19,345 INFO: [20231..][epoch:  0, iter:     800, lr:(7.000e-05,)] [eta: 5 days, 16:43:24, time (data): 0.275 (0.001)] l_g_pix: 1.1311e-01 l_g_percep: 4.5816e-01 l_codebook: 1.2530e+00 
+2023-12-24 23:32:46,803 INFO: [20231..][epoch:  0, iter:     900, lr:(7.000e-05,)] [eta: 5 days, 15:04:42, time (data): 0.269 (0.001)] l_g_pix: 9.2727e-02 l_g_percep: 4.2713e-01 l_codebook: 9.5933e-01 
+2023-12-24 23:33:14,250 INFO: [20231..][epoch:  0, iter:   1,000, lr:(7.000e-05,)] [eta: 5 days, 13:45:18, time (data): 0.270 (0.001)] l_g_pix: 9.9444e-02 l_g_percep: 4.0463e-01 l_codebook: 7.2951e-01 
+2023-12-24 23:33:41,722 INFO: [20231..][epoch:  0, iter:   1,100, lr:(7.000e-05,)] [eta: 5 days, 12:40:51, time (data): 0.271 (0.001)] l_g_pix: 9.9855e-02 l_g_percep: 4.0166e-01 l_codebook: 6.4925e-01 
+2023-12-24 23:34:09,227 INFO: [20231..][epoch:  0, iter:   1,200, lr:(7.000e-05,)] [eta: 5 days, 11:47:49, time (data): 0.268 (0.001)] l_g_pix: 7.6968e-02 l_g_percep: 3.8353e-01 l_codebook: 4.2695e-01 
+2023-12-24 23:34:36,364 INFO: [20231..][epoch:  0, iter:   1,300, lr:(7.000e-05,)] [eta: 5 days, 10:55:18, time (data): 0.280 (0.003)] l_g_pix: 8.6627e-02 l_g_percep: 3.4918e-01 l_codebook: 3.5258e-01 
+2023-12-24 23:35:03,673 INFO: [20231..][epoch:  0, iter:   1,400, lr:(7.000e-05,)] [eta: 5 days, 10:13:30, time (data): 0.272 (0.002)] l_g_pix: 6.7933e-02 l_g_percep: 3.2832e-01 l_codebook: 3.5699e-01 
+2023-12-24 23:35:31,082 INFO: [20231..][epoch:  0, iter:   1,500, lr:(7.000e-05,)] [eta: 5 days, 9:38:59, time (data): 0.267 (0.001)] l_g_pix: 8.7112e-02 l_g_percep: 3.5506e-01 l_codebook: 2.8614e-01 
+2023-12-24 23:35:58,517 INFO: [20231..][epoch:  0, iter:   1,600, lr:(7.000e-05,)] [eta: 5 days, 9:09:09, time (data): 0.271 (0.001)] l_g_pix: 8.9167e-02 l_g_percep: 3.5418e-01 l_codebook: 2.4940e-01 
+2023-12-24 23:36:25,953 INFO: [20231..][epoch:  0, iter:   1,700, lr:(7.000e-05,)] [eta: 5 days, 8:42:47, time (data): 0.274 (0.004)] l_g_pix: 1.0336e-01 l_g_percep: 3.5880e-01 l_codebook: 1.7965e-01 
+2023-12-24 23:36:53,208 INFO: [20231..][epoch:  0, iter:   1,800, lr:(7.000e-05,)] [eta: 5 days, 8:16:37, time (data): 0.272 (0.001)] l_g_pix: 7.1444e-02 l_g_percep: 3.3682e-01 l_codebook: 1.4995e-01 
+2023-12-24 23:37:20,518 INFO: [20231..][epoch:  0, iter:   1,900, lr:(7.000e-05,)] [eta: 5 days, 7:53:56, time (data): 0.270 (0.001)] l_g_pix: 7.9305e-02 l_g_percep: 3.5262e-01 l_codebook: 1.9566e-01 
+2023-12-24 23:37:47,971 INFO: [20231..][epoch:  0, iter:   2,000, lr:(7.000e-05,)] [eta: 5 days, 7:35:22, time (data): 0.284 (0.002)] l_g_pix: 6.8298e-02 l_g_percep: 3.5639e-01 l_codebook: 1.4090e-01 
+2023-12-24 23:38:15,346 INFO: [20231..][epoch:  0, iter:   2,100, lr:(7.000e-05,)] [eta: 5 days, 7:17:33, time (data): 0.281 (0.001)] l_g_pix: 5.5866e-02 l_g_percep: 3.1655e-01 l_codebook: 1.0347e-01 
+2023-12-24 23:38:42,713 INFO: [20231..][epoch:  0, iter:   2,200, lr:(7.000e-05,)] [eta: 5 days, 7:01:12, time (data): 0.269 (0.001)] l_g_pix: 7.9312e-02 l_g_percep: 2.8580e-01 l_codebook: 1.6257e-01 
+2023-12-24 23:39:10,084 INFO: [20231..][epoch:  0, iter:   2,300, lr:(7.000e-05,)] [eta: 5 days, 6:46:17, time (data): 0.272 (0.001)] l_g_pix: 7.1741e-02 l_g_percep: 3.1199e-01 l_codebook: 9.4240e-02 
+2023-12-24 23:39:37,480 INFO: [20231..][epoch:  0, iter:   2,400, lr:(7.000e-05,)] [eta: 5 days, 6:32:51, time (data): 0.271 (0.001)] l_g_pix: 7.3844e-02 l_g_percep: 3.2184e-01 l_codebook: 7.5787e-02 
+2023-12-24 23:40:04,955 INFO: [20231..][epoch:  0, iter:   2,500, lr:(7.000e-05,)] [eta: 5 days, 6:21:17, time (data): 0.270 (0.001)] l_g_pix: 6.7480e-02 l_g_percep: 3.4006e-01 l_codebook: 8.0419e-02 
+2023-12-24 23:40:32,552 INFO: [20231..][epoch:  0, iter:   2,600, lr:(7.000e-05,)] [eta: 5 days, 6:11:50, time (data): 0.274 (0.003)] l_g_pix: 6.8274e-02 l_g_percep: 2.8900e-01 l_codebook: 7.3266e-02 
+2023-12-24 23:40:59,780 INFO: [20231..][epoch:  0, iter:   2,700, lr:(7.000e-05,)] [eta: 5 days, 5:59:25, time (data): 0.281 (0.002)] l_g_pix: 7.0437e-02 l_g_percep: 3.2609e-01 l_codebook: 7.0003e-02 
+2023-12-24 23:41:27,268 INFO: [20231..][epoch:  0, iter:   2,800, lr:(7.000e-05,)] [eta: 5 days, 5:50:18, time (data): 0.270 (0.001)] l_g_pix: 5.7792e-02 l_g_percep: 2.7075e-01 l_codebook: 5.8122e-02 
+2023-12-24 23:41:54,610 INFO: [20231..][epoch:  0, iter:   2,900, lr:(7.000e-05,)] [eta: 5 days, 5:40:27, time (data): 0.268 (0.001)] l_g_pix: 7.2862e-02 l_g_percep: 2.8456e-01 l_codebook: 4.7593e-02 
+2023-12-24 23:42:21,987 INFO: [20231..][epoch:  0, iter:   3,000, lr:(7.000e-05,)] [eta: 5 days, 5:31:33, time (data): 0.284 (0.001)] l_g_pix: 6.4127e-02 l_g_percep: 3.1003e-01 l_codebook: 4.3623e-02 
+2023-12-24 23:42:49,524 INFO: [20231..][epoch:  0, iter:   3,100, lr:(7.000e-05,)] [eta: 5 days, 5:24:34, time (data): 0.270 (0.001)] l_g_pix: 6.3763e-02 l_g_percep: 3.0265e-01 l_codebook: 4.6490e-02 
+2023-12-24 23:43:17,286 INFO: [20231..][epoch:  0, iter:   3,200, lr:(7.000e-05,)] [eta: 5 days, 5:19:51, time (data): 0.284 (0.002)] l_g_pix: 6.3654e-02 l_g_percep: 2.6741e-01 l_codebook: 5.9259e-02 
+2023-12-24 23:43:44,534 INFO: [20231..][epoch:  0, iter:   3,300, lr:(7.000e-05,)] [eta: 5 days, 5:11:15, time (data): 0.274 (0.001)] l_g_pix: 5.2687e-02 l_g_percep: 2.8568e-01 l_codebook: 3.6964e-02 
+2023-12-24 23:44:12,077 INFO: [20231..][epoch:  0, iter:   3,400, lr:(7.000e-05,)] [eta: 5 days, 5:05:27, time (data): 0.271 (0.002)] l_g_pix: 6.5395e-02 l_g_percep: 2.7213e-01 l_codebook: 4.5635e-02 
+2023-12-24 23:44:39,536 INFO: [20231..][epoch:  0, iter:   3,500, lr:(7.000e-05,)] [eta: 5 days, 4:59:18, time (data): 0.272 (0.001)] l_g_pix: 5.5141e-02 l_g_percep: 2.5252e-01 l_codebook: 3.8942e-02 
+2023-12-24 23:45:07,109 INFO: [20231..][epoch:  0, iter:   3,600, lr:(7.000e-05,)] [eta: 5 days, 4:54:19, time (data): 0.272 (0.001)] l_g_pix: 5.4329e-02 l_g_percep: 2.4226e-01 l_codebook: 3.4026e-02 
+2023-12-24 23:45:34,487 INFO: [20231..][epoch:  0, iter:   3,700, lr:(7.000e-05,)] [eta: 5 days, 4:48:11, time (data): 0.272 (0.001)] l_g_pix: 5.2620e-02 l_g_percep: 2.5787e-01 l_codebook: 2.7822e-02 
+2023-12-24 23:46:01,831 INFO: [20231..][epoch:  0, iter:   3,800, lr:(7.000e-05,)] [eta: 5 days, 4:42:05, time (data): 0.274 (0.001)] l_g_pix: 7.4201e-02 l_g_percep: 2.9312e-01 l_codebook: 4.8494e-02 
+2023-12-24 23:46:29,341 INFO: [20231..][epoch:  0, iter:   3,900, lr:(7.000e-05,)] [eta: 5 days, 4:37:26, time (data): 0.272 (0.002)] l_g_pix: 5.5285e-02 l_g_percep: 2.3456e-01 l_codebook: 3.4533e-02 
+2023-12-24 23:46:56,831 INFO: [20231..][epoch:  0, iter:   4,000, lr:(7.000e-05,)] [eta: 5 days, 4:32:51, time (data): 0.269 (0.001)] l_g_pix: 5.1452e-02 l_g_percep: 2.5948e-01 l_codebook: 2.5613e-02 
+2023-12-24 23:47:23,994 INFO: [20231..][epoch:  0, iter:   4,100, lr:(7.000e-05,)] [eta: 5 days, 4:26:21, time (data): 0.264 (0.001)] l_g_pix: 5.4594e-02 l_g_percep: 2.3675e-01 l_codebook: 2.7686e-02 
+2023-12-24 23:47:51,566 INFO: [20231..][epoch:  0, iter:   4,200, lr:(7.000e-05,)] [eta: 5 days, 4:22:43, time (data): 0.280 (0.002)] l_g_pix: 5.4149e-02 l_g_percep: 2.4718e-01 l_codebook: 2.8277e-02 
+2023-12-24 23:48:19,076 INFO: [20231..][epoch:  0, iter:   4,300, lr:(7.000e-05,)] [eta: 5 days, 4:18:52, time (data): 0.278 (0.001)] l_g_pix: 4.2933e-02 l_g_percep: 2.2829e-01 l_codebook: 2.6973e-02 
+2023-12-24 23:48:46,316 INFO: [20231..][epoch:  0, iter:   4,400, lr:(7.000e-05,)] [eta: 5 days, 4:13:31, time (data): 0.267 (0.001)] l_g_pix: 5.6487e-02 l_g_percep: 2.3452e-01 l_codebook: 2.4192e-02 
+2023-12-24 23:49:13,800 INFO: [20231..][epoch:  0, iter:   4,500, lr:(7.000e-05,)] [eta: 5 days, 4:09:50, time (data): 0.267 (0.001)] l_g_pix: 5.1577e-02 l_g_percep: 2.6121e-01 l_codebook: 2.3396e-02 
+2023-12-24 23:49:41,133 INFO: [20231..][epoch:  0, iter:   4,600, lr:(7.000e-05,)] [eta: 5 days, 4:05:26, time (data): 0.285 (0.002)] l_g_pix: 5.6405e-02 l_g_percep: 2.6142e-01 l_codebook: 2.4079e-02 
+2023-12-24 23:50:08,528 INFO: [20231..][epoch:  0, iter:   4,700, lr:(7.000e-05,)] [eta: 5 days, 4:01:32, time (data): 0.286 (0.001)] l_g_pix: 4.4161e-02 l_g_percep: 2.3420e-01 l_codebook: 2.3142e-02 
+2023-12-24 23:50:35,947 INFO: [20231..][epoch:  0, iter:   4,800, lr:(7.000e-05,)] [eta: 5 days, 3:57:55, time (data): 0.272 (0.002)] l_g_pix: 4.5001e-02 l_g_percep: 2.4541e-01 l_codebook: 1.9448e-02 
+2023-12-24 23:51:03,500 INFO: [20231..][epoch:  0, iter:   4,900, lr:(7.000e-05,)] [eta: 5 days, 3:55:09, time (data): 0.268 (0.001)] l_g_pix: 4.8938e-02 l_g_percep: 2.3999e-01 l_codebook: 2.1728e-02 
+2023-12-24 23:51:30,761 INFO: [20231..][epoch:  0, iter:   5,000, lr:(7.000e-05,)] [eta: 5 days, 3:50:56, time (data): 0.270 (0.001)] l_g_pix: 3.8599e-02 l_g_percep: 2.2158e-01 l_codebook: 1.9212e-02 
+2023-12-24 23:51:58,060 INFO: [20231..][epoch:  0, iter:   5,100, lr:(7.000e-05,)] [eta: 5 days, 3:47:03, time (data): 0.283 (0.002)] l_g_pix: 5.0256e-02 l_g_percep: 2.3465e-01 l_codebook: 2.0614e-02 
+2023-12-24 23:52:25,647 INFO: [20231..][epoch:  0, iter:   5,200, lr:(7.000e-05,)] [eta: 5 days, 3:44:47, time (data): 0.271 (0.001)] l_g_pix: 5.6678e-02 l_g_percep: 2.5701e-01 l_codebook: 1.9834e-02 
+2023-12-24 23:52:53,246 INFO: [20231..][epoch:  0, iter:   5,300, lr:(7.000e-05,)] [eta: 5 days, 3:42:38, time (data): 0.270 (0.001)] l_g_pix: 4.5711e-02 l_g_percep: 2.1191e-01 l_codebook: 2.1120e-02 
+2023-12-24 23:53:20,520 INFO: [20231..][epoch:  0, iter:   5,400, lr:(7.000e-05,)] [eta: 5 days, 3:38:58, time (data): 0.273 (0.001)] l_g_pix: 3.6874e-02 l_g_percep: 2.0330e-01 l_codebook: 1.5727e-02 
+2023-12-24 23:53:47,962 INFO: [20231..][epoch:  0, iter:   5,500, lr:(7.000e-05,)] [eta: 5 days, 3:36:12, time (data): 0.283 (0.002)] l_g_pix: 4.3266e-02 l_g_percep: 2.3671e-01 l_codebook: 1.6681e-02 
+2023-12-24 23:54:15,425 INFO: [20231..][epoch:  0, iter:   5,600, lr:(7.000e-05,)] [eta: 5 days, 3:33:38, time (data): 0.272 (0.001)] l_g_pix: 5.4940e-02 l_g_percep: 2.8384e-01 l_codebook: 1.9726e-02 
+2023-12-24 23:54:42,803 INFO: [20231..][epoch:  0, iter:   5,700, lr:(7.000e-05,)] [eta: 5 days, 3:30:45, time (data): 0.275 (0.002)] l_g_pix: 4.4837e-02 l_g_percep: 2.1464e-01 l_codebook: 1.5566e-02 
+2023-12-24 23:55:10,287 INFO: [20231..][epoch:  0, iter:   5,800, lr:(7.000e-05,)] [eta: 5 days, 3:28:25, time (data): 0.268 (0.001)] l_g_pix: 3.9004e-02 l_g_percep: 2.3148e-01 l_codebook: 1.3715e-02 
+2023-12-24 23:55:37,738 INFO: [20231..][epoch:  0, iter:   5,900, lr:(7.000e-05,)] [eta: 5 days, 3:26:01, time (data): 0.269 (0.001)] l_g_pix: 4.5893e-02 l_g_percep: 2.2587e-01 l_codebook: 1.5361e-02 
+2023-12-24 23:56:05,101 INFO: [20231..][epoch:  0, iter:   6,000, lr:(7.000e-05,)] [eta: 5 days, 3:23:17, time (data): 0.279 (0.001)] l_g_pix: 3.8622e-02 l_g_percep: 2.4463e-01 l_codebook: 1.5144e-02 
+2023-12-24 23:56:32,559 INFO: [20231..][epoch:  0, iter:   6,100, lr:(7.000e-05,)] [eta: 5 days, 3:21:02, time (data): 0.285 (0.001)] l_g_pix: 5.0797e-02 l_g_percep: 2.6848e-01 l_codebook: 1.6083e-02 
+2023-12-24 23:56:59,738 INFO: [20231..][epoch:  0, iter:   6,200, lr:(7.000e-05,)] [eta: 5 days, 3:17:39, time (data): 0.268 (0.001)] l_g_pix: 3.8879e-02 l_g_percep: 2.0969e-01 l_codebook: 1.4352e-02 
+2023-12-24 23:57:27,037 INFO: [20231..][epoch:  0, iter:   6,300, lr:(7.000e-05,)] [eta: 5 days, 3:14:52, time (data): 0.268 (0.001)] l_g_pix: 4.3309e-02 l_g_percep: 2.3073e-01 l_codebook: 1.3363e-02 
+2023-12-24 23:57:54,536 INFO: [20231..][epoch:  0, iter:   6,400, lr:(7.000e-05,)] [eta: 5 days, 3:12:59, time (data): 0.268 (0.001)] l_g_pix: 4.0129e-02 l_g_percep: 1.9999e-01 l_codebook: 1.3765e-02 
+2023-12-24 23:58:21,710 INFO: [20231..][epoch:  0, iter:   6,500, lr:(7.000e-05,)] [eta: 5 days, 3:09:50, time (data): 0.269 (0.001)] l_g_pix: 4.4543e-02 l_g_percep: 2.2676e-01 l_codebook: 1.3338e-02 
+2023-12-24 23:58:49,015 INFO: [20231..][epoch:  0, iter:   6,600, lr:(7.000e-05,)] [eta: 5 days, 3:07:16, time (data): 0.277 (0.001)] l_g_pix: 3.3047e-02 l_g_percep: 1.8998e-01 l_codebook: 1.1733e-02 
+2023-12-24 23:59:16,496 INFO: [20231..][epoch:  0, iter:   6,700, lr:(7.000e-05,)] [eta: 5 days, 3:05:28, time (data): 0.273 (0.003)] l_g_pix: 5.1024e-02 l_g_percep: 2.7465e-01 l_codebook: 1.4218e-02 
+2023-12-24 23:59:43,966 INFO: [20231..][epoch:  0, iter:   6,800, lr:(7.000e-05,)] [eta: 5 days, 3:03:41, time (data): 0.267 (0.001)] l_g_pix: 4.9260e-02 l_g_percep: 2.2356e-01 l_codebook: 1.3535e-02 
+2023-12-25 00:00:11,567 INFO: [20231..][epoch:  0, iter:   6,900, lr:(7.000e-05,)] [eta: 5 days, 3:02:25, time (data): 0.281 (0.002)] l_g_pix: 5.4289e-02 l_g_percep: 2.4243e-01 l_codebook: 1.3448e-02 
+2023-12-25 00:00:39,046 INFO: [20231..][epoch:  0, iter:   7,000, lr:(7.000e-05,)] [eta: 5 days, 3:00:43, time (data): 0.271 (0.001)] l_g_pix: 4.5504e-02 l_g_percep: 2.3994e-01 l_codebook: 1.2311e-02 
+2023-12-25 00:01:06,170 INFO: [20231..][epoch:  0, iter:   7,100, lr:(7.000e-05,)] [eta: 5 days, 2:57:44, time (data): 0.274 (0.001)] l_g_pix: 4.8874e-02 l_g_percep: 2.2735e-01 l_codebook: 1.3459e-02 
+2023-12-25 00:01:33,738 INFO: [20231..][epoch:  0, iter:   7,200, lr:(7.000e-05,)] [eta: 5 days, 2:56:27, time (data): 0.278 (0.002)] l_g_pix: 4.6665e-02 l_g_percep: 2.2454e-01 l_codebook: 1.1055e-02 
+2023-12-25 00:02:01,277 INFO: [20231..][epoch:  0, iter:   7,300, lr:(7.000e-05,)] [eta: 5 days, 2:55:05, time (data): 0.275 (0.009)] l_g_pix: 3.8088e-02 l_g_percep: 2.1648e-01 l_codebook: 1.0887e-02 
+2023-12-25 00:02:28,730 INFO: [20231..][epoch:  0, iter:   7,400, lr:(7.000e-05,)] [eta: 5 days, 2:53:26, time (data): 0.269 (0.001)] l_g_pix: 3.4761e-02 l_g_percep: 2.1499e-01 l_codebook: 1.1601e-02 
+2023-12-25 00:02:56,199 INFO: [20231..][epoch:  0, iter:   7,500, lr:(7.000e-05,)] [eta: 5 days, 2:51:53, time (data): 0.268 (0.001)] l_g_pix: 4.5505e-02 l_g_percep: 2.6855e-01 l_codebook: 1.1289e-02 
+2023-12-25 00:03:23,305 INFO: [20231..][epoch:  0, iter:   7,600, lr:(7.000e-05,)] [eta: 5 days, 2:49:05, time (data): 0.268 (0.001)] l_g_pix: 4.5818e-02 l_g_percep: 2.1102e-01 l_codebook: 1.2096e-02 
+2023-12-25 00:03:50,899 INFO: [20231..][epoch:  0, iter:   7,700, lr:(7.000e-05,)] [eta: 5 days, 2:48:02, time (data): 0.276 (0.002)] l_g_pix: 3.0789e-02 l_g_percep: 2.1831e-01 l_codebook: 9.2204e-03 
+2023-12-25 00:04:18,097 INFO: [20231..][epoch:  0, iter:   7,800, lr:(7.000e-05,)] [eta: 5 days, 2:45:38, time (data): 0.269 (0.001)] l_g_pix: 4.2235e-02 l_g_percep: 2.5210e-01 l_codebook: 1.2134e-02 
+2023-12-25 00:04:45,777 INFO: [20231..][epoch:  0, iter:   7,900, lr:(7.000e-05,)] [eta: 5 days, 2:44:55, time (data): 0.274 (0.001)] l_g_pix: 3.9143e-02 l_g_percep: 1.8825e-01 l_codebook: 9.4369e-03 
+2023-12-25 00:05:12,904 INFO: [20231..][epoch:  0, iter:   8,000, lr:(7.000e-05,)] [eta: 5 days, 2:42:22, time (data): 0.268 (0.001)] l_g_pix: 4.3036e-02 l_g_percep: 2.1872e-01 l_codebook: 1.0719e-02 
+2023-12-25 00:05:40,224 INFO: [20231..][epoch:  0, iter:   8,100, lr:(7.000e-05,)] [eta: 5 days, 2:40:31, time (data): 0.274 (0.002)] l_g_pix: 4.4872e-02 l_g_percep: 2.4410e-01 l_codebook: 1.0667e-02 
+2023-12-25 00:06:07,609 INFO: [20231..][epoch:  0, iter:   8,200, lr:(7.000e-05,)] [eta: 5 days, 2:38:54, time (data): 0.272 (0.001)] l_g_pix: 4.6986e-02 l_g_percep: 2.2094e-01 l_codebook: 1.0057e-02 
+2023-12-25 00:06:35,202 INFO: [20231..][epoch:  0, iter:   8,300, lr:(7.000e-05,)] [eta: 5 days, 2:37:58, time (data): 0.275 (0.003)] l_g_pix: 4.0032e-02 l_g_percep: 2.1780e-01 l_codebook: 9.1573e-03 
+2023-12-25 00:07:02,622 INFO: [20231..][epoch:  0, iter:   8,400, lr:(7.000e-05,)] [eta: 5 days, 2:36:30, time (data): 0.270 (0.001)] l_g_pix: 4.3673e-02 l_g_percep: 2.4258e-01 l_codebook: 1.0448e-02 
+2023-12-25 00:07:30,063 INFO: [20231..][epoch:  0, iter:   8,500, lr:(7.000e-05,)] [eta: 5 days, 2:35:08, time (data): 0.281 (0.001)] l_g_pix: 4.4049e-02 l_g_percep: 2.2152e-01 l_codebook: 9.6625e-03 
+2023-12-25 00:07:57,513 INFO: [20231..][epoch:  0, iter:   8,600, lr:(7.000e-05,)] [eta: 5 days, 2:33:49, time (data): 0.273 (0.002)] l_g_pix: 3.6123e-02 l_g_percep: 2.2381e-01 l_codebook: 9.2913e-03 
+2023-12-25 00:08:24,689 INFO: [20231..][epoch:  0, iter:   8,700, lr:(7.000e-05,)] [eta: 5 days, 2:31:40, time (data): 0.274 (0.002)] l_g_pix: 3.9527e-02 l_g_percep: 2.1259e-01 l_codebook: 9.7242e-03 
+2023-12-25 00:08:52,030 INFO: [20231..][epoch:  0, iter:   8,800, lr:(7.000e-05,)] [eta: 5 days, 2:30:04, time (data): 0.269 (0.001)] l_g_pix: 3.8454e-02 l_g_percep: 2.1750e-01 l_codebook: 9.6882e-03 
+2023-12-25 00:09:19,491 INFO: [20231..][epoch:  0, iter:   8,900, lr:(7.000e-05,)] [eta: 5 days, 2:28:51, time (data): 0.273 (0.001)] l_g_pix: 3.5182e-02 l_g_percep: 1.8127e-01 l_codebook: 9.9822e-03 
+2023-12-25 00:09:46,669 INFO: [20231..][epoch:  0, iter:   9,000, lr:(7.000e-05,)] [eta: 5 days, 2:26:49, time (data): 0.276 (0.002)] l_g_pix: 3.4142e-02 l_g_percep: 1.8962e-01 l_codebook: 8.5649e-03 
+2023-12-25 00:10:13,920 INFO: [20231..][epoch:  0, iter:   9,100, lr:(7.000e-05,)] [eta: 5 days, 2:25:02, time (data): 0.270 (0.001)] l_g_pix: 3.9402e-02 l_g_percep: 2.2662e-01 l_codebook: 9.4060e-03 
+2023-12-25 00:10:41,398 INFO: [20231..][epoch:  0, iter:   9,200, lr:(7.000e-05,)] [eta: 5 days, 2:23:55, time (data): 0.268 (0.001)] l_g_pix: 3.4831e-02 l_g_percep: 1.9363e-01 l_codebook: 9.0868e-03 
+2023-12-25 00:11:09,038 INFO: [20231..][epoch:  0, iter:   9,300, lr:(7.000e-05,)] [eta: 5 days, 2:23:17, time (data): 0.276 (0.001)] l_g_pix: 5.0044e-02 l_g_percep: 2.2381e-01 l_codebook: 9.6685e-03 
+2023-12-25 00:11:36,416 INFO: [20231..][epoch:  0, iter:   9,400, lr:(7.000e-05,)] [eta: 5 days, 2:21:56, time (data): 0.273 (0.001)] l_g_pix: 3.5297e-02 l_g_percep: 2.2009e-01 l_codebook: 8.7955e-03 
+2023-12-25 00:12:03,594 INFO: [20231..][epoch:  0, iter:   9,500, lr:(7.000e-05,)] [eta: 5 days, 2:20:01, time (data): 0.285 (0.001)] l_g_pix: 4.4678e-02 l_g_percep: 2.0647e-01 l_codebook: 9.7503e-03 
+2023-12-25 00:12:31,012 INFO: [20231..][epoch:  0, iter:   9,600, lr:(7.000e-05,)] [eta: 5 days, 2:18:49, time (data): 0.271 (0.001)] l_g_pix: 3.3904e-02 l_g_percep: 1.8101e-01 l_codebook: 9.0435e-03 
+2023-12-25 00:12:58,167 INFO: [20231..][epoch:  0, iter:   9,700, lr:(7.000e-05,)] [eta: 5 days, 2:16:54, time (data): 0.269 (0.001)] l_g_pix: 3.2822e-02 l_g_percep: 1.9020e-01 l_codebook: 8.1455e-03 
+2023-12-25 00:13:25,751 INFO: [20231..][epoch:  0, iter:   9,800, lr:(7.000e-05,)] [eta: 5 days, 2:16:10, time (data): 0.288 (0.006)] l_g_pix: 3.2872e-02 l_g_percep: 1.9596e-01 l_codebook: 8.3288e-03 
+2023-12-25 00:13:53,225 INFO: [20231..][epoch:  0, iter:   9,900, lr:(7.000e-05,)] [eta: 5 days, 2:15:09, time (data): 0.282 (0.001)] l_g_pix: 3.7453e-02 l_g_percep: 2.4398e-01 l_codebook: 8.2161e-03 
+2023-12-25 00:14:20,711 INFO: [20231..][epoch:  0, iter:  10,000, lr:(7.000e-05,)] [eta: 5 days, 2:14:11, time (data): 0.271 (0.001)] l_g_pix: 4.8490e-02 l_g_percep: 2.7125e-01 l_codebook: 9.8746e-03 
+2023-12-25 00:14:20,712 INFO: Saving models and training states.
+2023-12-25 00:14:54,774 INFO: [20231..][epoch:  0, iter:  10,100, lr:(7.000e-05,)] [eta: 5 days, 2:30:29, time (data): 0.279 (0.002)] l_g_pix: 4.2985e-02 l_g_percep: 2.3420e-01 l_codebook: 1.0079e-02 
+2023-12-25 00:15:22,251 INFO: [20231..][epoch:  0, iter:  10,200, lr:(7.000e-05,)] [eta: 5 days, 2:29:20, time (data): 0.274 (0.003)] l_g_pix: 3.0203e-02 l_g_percep: 1.7659e-01 l_codebook: 7.8172e-03 
+2023-12-25 00:15:49,921 INFO: [20231..][epoch:  0, iter:  10,300, lr:(7.000e-05,)] [eta: 5 days, 2:28:42, time (data): 0.280 (0.001)] l_g_pix: 3.6835e-02 l_g_percep: 1.9596e-01 l_codebook: 7.8900e-03 
+2023-12-25 00:16:17,404 INFO: [20231..][epoch:  0, iter:  10,400, lr:(7.000e-05,)] [eta: 5 days, 2:27:36, time (data): 0.269 (0.002)] l_g_pix: 4.4128e-02 l_g_percep: 1.8069e-01 l_codebook: 8.7771e-03 
+2023-12-25 00:16:45,117 INFO: [20231..][epoch:  0, iter:  10,500, lr:(7.000e-05,)] [eta: 5 days, 2:27:05, time (data): 0.279 (0.001)] l_g_pix: 3.8089e-02 l_g_percep: 2.0581e-01 l_codebook: 7.9826e-03 
+2023-12-25 00:17:12,708 INFO: [20231..][epoch:  0, iter:  10,600, lr:(7.000e-05,)] [eta: 5 days, 2:26:16, time (data): 0.270 (0.001)] l_g_pix: 3.3541e-02 l_g_percep: 1.8705e-01 l_codebook: 7.6846e-03 
+2023-12-25 00:17:39,920 INFO: [20231..][epoch:  0, iter:  10,700, lr:(7.000e-05,)] [eta: 5 days, 2:24:31, time (data): 0.269 (0.001)] l_g_pix: 3.6825e-02 l_g_percep: 2.0851e-01 l_codebook: 8.3212e-03 
+2023-12-25 00:18:07,339 INFO: [20231..][epoch:  0, iter:  10,800, lr:(7.000e-05,)] [eta: 5 days, 2:23:18, time (data): 0.274 (0.004)] l_g_pix: 4.6207e-02 l_g_percep: 2.4057e-01 l_codebook: 9.3097e-03 
+2023-12-25 00:18:34,955 INFO: [20231..][epoch:  0, iter:  10,900, lr:(7.000e-05,)] [eta: 5 days, 2:22:34, time (data): 0.284 (0.002)] l_g_pix: 3.2298e-02 l_g_percep: 1.9860e-01 l_codebook: 7.6507e-03 
+2023-12-25 00:19:02,567 INFO: [20231..][epoch:  0, iter:  11,000, lr:(7.000e-05,)] [eta: 5 days, 2:21:50, time (data): 0.270 (0.001)] l_g_pix: 3.3713e-02 l_g_percep: 2.2323e-01 l_codebook: 8.5918e-03 
+2023-12-25 00:19:29,948 INFO: [20231..][epoch:  0, iter:  11,100, lr:(7.000e-05,)] [eta: 5 days, 2:20:34, time (data): 0.267 (0.001)] l_g_pix: 3.8551e-02 l_g_percep: 1.8808e-01 l_codebook: 7.7308e-03 
+2023-12-25 00:19:57,466 INFO: [20231..][epoch:  0, iter:  11,200, lr:(7.000e-05,)] [eta: 5 days, 2:19:37, time (data): 0.269 (0.001)] l_g_pix: 4.5158e-02 l_g_percep: 2.0320e-01 l_codebook: 9.1305e-03 
+2023-12-25 00:20:24,740 INFO: [20231..][epoch:  0, iter:  11,300, lr:(7.000e-05,)] [eta: 5 days, 2:18:07, time (data): 0.268 (0.001)] l_g_pix: 3.7238e-02 l_g_percep: 1.8241e-01 l_codebook: 8.0244e-03 
+2023-12-25 00:20:52,444 INFO: [20231..][epoch:  0, iter:  11,400, lr:(7.000e-05,)] [eta: 5 days, 2:17:38, time (data): 0.272 (0.001)] l_g_pix: 3.0115e-02 l_g_percep: 2.0446e-01 l_codebook: 7.7292e-03 
+Ex

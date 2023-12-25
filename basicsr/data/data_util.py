@@ -5,7 +5,8 @@ import torch
 from os import path as osp
 from PIL import Image, ImageDraw
 from torch.nn import functional as F
-
+import glob
+import os
 from basicsr.data.transforms import mod_crop
 from basicsr.utils import img2tensor, scandir
 
@@ -237,6 +238,20 @@ def paths_from_folder(folder):
 
     paths = list(scandir(folder))
     paths = [osp.join(folder, path) for path in paths]
+    return paths
+
+
+def paths_from_folder1(folder):
+    """Generate paths from folder.
+
+    Args:
+        folder (str): Folder path.
+
+    Returns:
+        list[str]: Returned path list.
+    """
+
+    paths = glob.glob(os.path.join(folder,"**","*.png"),recursive=True)
     return paths
 
 

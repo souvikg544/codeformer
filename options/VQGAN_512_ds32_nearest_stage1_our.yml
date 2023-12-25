@@ -1,5 +1,5 @@
 # general settings
-name: VQGAN-512-ds32-nearest-stage1
+name: VQGAN-512-ds32-nearest-stage1_our
 model_type: VQGANModel
 num_gpu: 8
 manual_seed: 0
@@ -7,9 +7,9 @@ manual_seed: 0
 # dataset and data loader settings
 datasets:
   train:
-    name: FFHQ
-    type: FFHQBlindDataset
-    dataroot_gt: datasets/ffhq/ffhq_512
+    name: avspeech
+    type: avspeechDataset
+    dataroot_gt: /ssd_scratch/cvit/souvik/corrected_avspeech50/
     filename_tmpl: '{}'
     io_backend:
       type: disk
@@ -23,7 +23,7 @@ datasets:
 
     # data loader
     num_worker_per_gpu: 2
-    batch_size_per_gpu: 4
+    batch_size_per_gpu: 1
     dataset_enlarge_ratio: 100
 
     prefetch_mode: cpu

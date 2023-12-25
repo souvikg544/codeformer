@@ -129,6 +129,7 @@ def imfrombytes(content, flag='color', float32=False):
     img = cv2.imdecode(img_np, imread_flags[flag])
     if float32:
         img = img.astype(np.float32) / 255.
+    img=cv2.resize(img,(512,512),interpolation=cv2.INTER_LINEAR)
     return img
 
 

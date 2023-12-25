@@ -11,15 +11,15 @@ from torchvision.transforms.functional import (adjust_brightness, adjust_contras
                                         adjust_hue, adjust_saturation, normalize)
 from basicsr.data import gaussian_kernels as gaussian_kernels
 from basicsr.data.transforms import augment
-from basicsr.data.data_util import paths_from_folder, brush_stroke_mask, random_ff_mask
+from basicsr.data.data_util import paths_from_folder1, brush_stroke_mask, random_ff_mask
 from basicsr.utils import FileClient, get_root_logger, imfrombytes, img2tensor
 from basicsr.utils.registry import DATASET_REGISTRY
 
 @DATASET_REGISTRY.register()
-class FFHQBlindDataset(data.Dataset):
+class avspeechDataset(data.Dataset):
 
     def __init__(self, opt):
-        super(FFHQBlindDataset, self).__init__()
+        super(avspeechDataset, self).__init__()
         logger = get_root_logger()
         self.opt = opt
         # file client (io backend)
@@ -59,7 +59,7 @@ class FFHQBlindDataset(data.Dataset):
             with open(osp.join(self.gt_folder, 'meta_info.txt')) as fin:
                 self.paths = [line.split('.')[0] for line in fin]
         else:
-            self.paths = paths_from_folder(self.gt_folder)
+            self.paths = paths_from_folder1(self.gt_folder)
 
         # inpainting mask
         self.gen_inpaint_mask = opt.get('gen_inpaint_mask', False)
@@ -296,5 +296,5 @@ class FFHQBlindDataset(data.Dataset):
 
 
     def __len__(self):
-        prin(len(self.paths))
+        print("number of items- ",len(self.paths))
         return len(self.paths)
